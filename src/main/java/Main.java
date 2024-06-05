@@ -14,11 +14,16 @@ Poniższe zadania będą się sprowadzały do modyfikacji bazowego kodu. Proces 
 
 import java.io.IOException;
 import java.util.Scanner;
+import java.util.regex.Pattern;
+import java.util.regex.Matcher;
 
 class WrongStudentName extends Exception {
 }
 
 class WrongStudentAge extends Exception {
+}
+
+class WrongStudentDate extends Exception {
 }
 
 class Main {
@@ -44,9 +49,11 @@ class Main {
             } catch (IOException e) {
                 e.printStackTrace();
             } catch (WrongStudentName e) {
-                System.out.println("Błędne imie studenta!");
+                System.out.println("Błędne imię studenta!");
             } catch (WrongStudentAge e) {
                 System.out.println("Błędny wiek studenta!");
+            } catch (WrongStudentDate e) {
+                System.out.println("Błędna data urodzenia!");
             }
         }
     }
@@ -61,8 +68,8 @@ class Main {
     }
 
     public static String ReadName() throws WrongStudentName {
-        scan.nextLine();
-        System.out.println("Podaj imie: ");
+        scan.nextLine(); 
+        System.out.println("Podaj imię: ");
         String name = scan.nextLine();
         if (name.contains(" "))
             throw new WrongStudentName();
@@ -77,12 +84,26 @@ class Main {
         return age;
     }
 
-    public static void exercise1() throws IOException, WrongStudentName, WrongStudentAge {
+    public static String ReadDate() throws WrongStudentDate {
+        scan.nextLine(); 
+        System.out.println("Podaj datę urodzenia DD-MM-YYYY: ");
+        String date = scan.nextLine();
+        if (!isValidDate(date))
+            throw new WrongStudentDate();
+        return date;
+    }
+
+    public static boolean isValidDate(String date) {
+        String regex = "^(3[01]|[12][0-9]|0[1-9])-(1[0-2]|0[1-9])-(19[0-9]{2}|20[0-2][0-4])$";
+        Pattern pattern = Pattern.compile(regex);
+        Matcher matcher = pattern.matcher(date);
+        return matcher.matches();
+    }
+
+    public static void exercise1() throws IOException, WrongStudentName, WrongStudentAge, WrongStudentDate {
         var name = ReadName();
         var age = ReadAge();
-        scan.nextLine();
-        System.out.println("Podaj datę urodzenia DD-MM-YYY");
-        var date = scan.nextLine();
+        var date = ReadDate();
         (new Service()).addStudent(new Student(name, age, date));
     }
 
@@ -94,8 +115,8 @@ class Main {
     }
 
     public static void exercise3() throws IOException {
-        scan.nextLine();
-        System.out.println("Podaj imie: ");
+        scan.nextLine(); 
+        System.out.println("Podaj imię: ");
         var name = scan.nextLine();
         var wanted = (new Service()).findStudentByName(name);
         if (wanted == null)
