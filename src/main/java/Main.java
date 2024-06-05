@@ -26,49 +26,72 @@ class WrongStudentAge extends Exception {
 class WrongStudentDate extends Exception {
 }
 
+class InvalidMenuOption extends Exception {
+    public InvalidMenuOption(String message) {
+        super(message);
+    }
+}
+
 class Main {
     public static Scanner scan = new Scanner(System.in);
 
     public static void main(String[] args) {
-        while (true) {
-            try {
-                int ex = menu();
-                switch (ex) {
-                    case 1:
-                        exercise1();
-                        break;
-                    case 2:
-                        exercise2();
-                        break;
-                    case 3:
-                        exercise3();
-                        break;
-                    default:
-                        return;
+        try {
+            while (true) {
+                try {
+                    int ex = menu();
+                    switch (ex) {
+                        case 1:
+                            exercise1();
+                            break;
+                        case 2:
+                            exercise2();
+                            break;
+                        case 3:
+                            exercise3();
+                            break;
+                        case 0:
+                            return;
+                        default:
+                            throw new InvalidMenuOption("Nieprawidłowa opcja menu: " + ex);
+                    }
+                } catch (IOException e) {
+                    e.printStackTrace();
+                } catch (WrongStudentName e) {
+                    System.out.println("Błędne imię studenta!");
+                } catch (WrongStudentAge e) {
+                    System.out.println("Błędny wiek studenta!");
+                } catch (WrongStudentDate e) {
+                    System.out.println("Błędna data urodzenia!");
                 }
-            } catch (IOException e) {
-                e.printStackTrace();
-            } catch (WrongStudentName e) {
-                System.out.println("Błędne imię studenta!");
-            } catch (WrongStudentAge e) {
-                System.out.println("Błędny wiek studenta!");
-            } catch (WrongStudentDate e) {
-                System.out.println("Błędna data urodzenia!");
             }
+        } catch (InvalidMenuOption e) {
+            System.out.println(e.getMessage());
+            System.out.println("Program zostanie zakończony.");
         }
     }
 
-    public static int menu() {
+    public static int menu() throws InvalidMenuOption {
         System.out.println("Wciśnij:");
         System.out.println("1 - aby dodać studenta");
         System.out.println("2 - aby wypisać wszystkich studentów");
         System.out.println("3 - aby wyszukać studenta po imieniu");
         System.out.println("0 - aby wyjść z programu");
-        return scan.nextInt();
+        String input = scan.nextLine();
+        if (!isInteger(input)) {
+            throw new InvalidMenuOption("Nieprawidłowa opcja menu: " + input);
+        }
+        return Integer.parseInt(input);
+    }
+
+    public static boolean isInteger(String str) {
+        Pattern pattern = Pattern.compile("^\\d+$");
+        Matcher matcher = pattern.matcher(str);
+        return matcher.matches();
     }
 
     public static String ReadName() throws WrongStudentName {
-        scan.nextLine(); 
+        scan.nextLine();
         System.out.println("Podaj imię: ");
         String name = scan.nextLine();
         if (name.contains(" "))
@@ -85,7 +108,7 @@ class Main {
     }
 
     public static String ReadDate() throws WrongStudentDate {
-        scan.nextLine(); 
+        scan.nextLine();
         System.out.println("Podaj datę urodzenia DD-MM-YYYY: ");
         String date = scan.nextLine();
         if (!isValidDate(date))
@@ -115,7 +138,7 @@ class Main {
     }
 
     public static void exercise3() throws IOException {
-        scan.nextLine(); 
+        scan.nextLine();
         System.out.println("Podaj imię: ");
         var name = scan.nextLine();
         var wanted = (new Service()).findStudentByName(name);
